@@ -613,27 +613,49 @@ function getJSON(u){return fetch(u,{headers:{Accept:"application/vnd.github+json
   return r.json();});}
 function getText(u){return fetch(u+"?t="+Date.now()).then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.text();});}
 
-var S={reports:[], wipDate:null, cache:{}, date:null, doc:null};
+var S={reports:[], wipDate:null, cache:{}, date:null, doc:null, viaApi:false};
 
-function loadIndex(){
+/* 목록·본문은 Pages와 같은 출처에서 읽는다.
+   api.github.com 은 미인증 시 IP당 시간당 60회 제한이라, 통신사 NAT로 IP를 공유하는
+   모바일에서 쉽게 막히고 일부 사내망은 호스트 자체를 차단한다.
+   scripts/build-index.ps1 이 만들어 두는 docs/index.json 을 1순위로 쓰고,
+   그 파일이 없을 때만 GitHub API로 폴백한다. */
+function loadIndexLocal(){
+  return getJSON("./index.json").then(function(m){
+    if(!m || !m.reports) throw new Error("BAD_MANIFEST");
+    S.reports=m.reports.map(function(r){return {date:r.date, name:r.file};})
+      .sort(function(a,b){return a.date<b.date?1:-1;});
+    var w=m.wip||[];
+    S.wipDate=w.length?w.slice().sort()[w.length-1]:null;
+    S.viaApi=false;
+  });
+}
+function loadIndexApi(){
   return getJSON(API+"reports?ref="+BRANCH).then(function(items){
     S.reports=items.filter(function(f){return f.type==="file"&&REPORT_RE.test(f.name);})
       .map(function(f){return {date:REPORT_RE.exec(f.name)[1], name:f.name};})
       .sort(function(a,b){return a.date<b.date?1:-1;});
+    S.viaApi=true;
     return getJSON(API+"reports/_wip?ref="+BRANCH).then(function(d){
       var ds=d.filter(function(x){return x.type==="dir";}).map(function(x){return x.name;}).sort();
       S.wipDate=ds.length?ds[ds.length-1]:null;
     }).catch(function(){S.wipDate=null;});
   });
 }
+function loadIndex(){
+  return loadIndexLocal().catch(function(){ return loadIndexApi(); });
+}
 function loadReport(date){
   if(S.cache[date]) return Promise.resolve(S.cache[date]);
   var rep=S.reports.filter(function(r){return r.date===date;})[0];
   if(!rep) return Promise.reject(new Error("리포트 없음: "+date));
-  return getText(RAW+"reports/"+rep.name).then(function(md){
-    var doc=parseReport(md); doc.file=rep.name; doc.date=date;
-    S.cache[date]=doc; return doc;
-  });
+  var local="./reports/"+rep.name;
+  return getText(local)
+    .catch(function(){ return getText(RAW+"docs/reports/"+rep.name); })   // 폴백
+    .then(function(md){
+      var doc=parseReport(md); doc.file=rep.name; doc.date=date;
+      S.cache[date]=doc; return doc;
+    });
 }
 
 /* ---------- chrome ---------- */
@@ -656,11 +678,11 @@ function liveBanner(){
   var latest=S.reports.length?S.reports[0].date:null;
   if(!(S.wipDate&&S.wipDate!==latest)) return "";
   return '<div class="banner live"><h4>🔴 '+S.wipDate+' 브리핑 생성 중</h4>'+
-    '<p>완료된 섹션이 순서대로 올라옵니다. <a href="https://github.com/'+OWNER+'/'+REPO+'/blob/'+BRANCH+'/reports/_wip/'+S.wipDate+'/STATUS.md" target="_blank" rel="noopener">진행 상황 보기 →</a></p></div>';
+    '<p>완료된 섹션이 순서대로 올라옵니다. <a href="https://github.com/'+OWNER+'/'+REPO+'/blob/'+BRANCH+'/docs/reports/_wip/'+S.wipDate+'/STATUS.md" target="_blank" rel="noopener">진행 상황 보기 →</a></p></div>';
 }
 function foot(doc){
   $("foot").innerHTML = doc
-    ? '<span>원본 <a href="https://github.com/'+OWNER+'/'+REPO+'/blob/'+BRANCH+'/reports/'+doc.file+'" target="_blank" rel="noopener">'+doc.file+'</a></span>'+
+    ? '<span>원본 <a href="https://github.com/'+OWNER+'/'+REPO+'/blob/'+BRANCH+'/docs/reports/'+doc.file+'" target="_blank" rel="noopener">'+doc.file+'</a></span>'+
       '<span><a href="https://github.com/'+OWNER+'/'+REPO+'" target="_blank" rel="noopener">'+OWNER+'/'+REPO+'</a></span>'+
       '<span>매일 08:00 KST 자동 생성</span>'
     : '<span><a href="https://github.com/'+OWNER+'/'+REPO+'" target="_blank" rel="noopener">'+OWNER+'/'+REPO+'</a></span>';
@@ -759,7 +781,7 @@ function viewHome(doc){
        "<dt>작성일</dt><dd>"+esc(doc.date)+"</dd>"+
        (period?"<dt>커버 기간</dt><dd>"+esc(period)+"</dd>":"")+
        "<dt>생성 주기</dt><dd>매일 08:00 KST 자동 생성</dd>"+
-       "<dt>원본</dt><dd><a href=\"https://github.com/"+OWNER+"/"+REPO+"/blob/"+BRANCH+"/reports/"+doc.file+"\" target=\"_blank\" rel=\"noopener\">"+esc(doc.file)+"</a></dd>"+
+       "<dt>원본</dt><dd><a href=\"https://github.com/"+OWNER+"/"+REPO+"/blob/"+BRANCH+"/docs/reports/"+doc.file+"\" target=\"_blank\" rel=\"noopener\">"+esc(doc.file)+"</a></dd>"+
      "</dl>"+
      (notes.length?'<div class="notes">'+notes.map(function(t){return "<p>"+inline(t)+"</p>";}).join("")+"</div>":"")+
      "</div>";

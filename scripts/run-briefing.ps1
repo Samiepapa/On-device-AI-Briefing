@@ -32,9 +32,10 @@ git pull --rebase --autostash 2>&1 | ForEach-Object { Log "git: $_" }
 $Prompt = @'
 오늘자 On-device AI 동향 브리핑 리포트를 작성하라.
 에이전트 정의(.claude/agents/on-device-ai-monitor.md)의 실행 절차를 그대로 따른다.
-6개 도메인을 병렬로 조사하고, 완료된 섹션은 reports/_wip/ 에 즉시 저장하며,
+6개 도메인을 병렬로 조사하고, 완료된 섹션은 docs/reports/_wip/ 에 즉시 저장하며,
 체크포인트마다 git commit & push 한다.
-최종 리포트는 reports/YYYY-MM-DD-on-device-ai-briefing.md 에 저장한다.
+전체판은 reports/_internal/YYYY-MM-DD-on-device-ai-briefing.md 에,
+공개판은 docs/reports/YYYY-MM-DD-on-device-ai-briefing.md 에 저장한다.
 '@
 
 $AllowedTools = @(
@@ -55,12 +56,17 @@ $ExitCode = $LASTEXITCODE
 
 $ClaudeOut | ForEach-Object { Add-Content -Path $LogFile -Value $_ -Encoding utf8 }
 
-$ReportPath = Join-Path $ProjectRoot "reports\$Date-on-device-ai-briefing.md"
+$ReportPath = Join-Path $ProjectRoot "docs\reports\$Date-on-device-ai-briefing.md"
 if (Test-Path $ReportPath) {
     Log "SUCCESS — 리포트 생성 완료: $ReportPath"
 } else {
     Log "WARNING — 리포트 파일이 없다: $ReportPath (claude exit=$ExitCode)"
 }
+
+# 뷰어가 읽는 목록 파일을 항상 다시 만든다.
+# 에이전트가 빠뜨려도 여기서 보정되므로 목록이 어긋날 일이 없다.
+& powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'build-index.ps1') 2>&1 |
+    ForEach-Object { Log "index: $_" }
 
 # 에이전트가 push하지 못한 변경이 남아 있으면 여기서 한 번 더 시도한다
 $Dirty = git status --porcelain
