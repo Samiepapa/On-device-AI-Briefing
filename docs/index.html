@@ -387,6 +387,51 @@ footer .fwrap span{overflow-wrap:anywhere}
   <div class="state"><div class="spinner"></div>리포트를 불러오는 중…</div>
 </div>
 
+<script>
+/* 진단 트랩 — 반드시 본 스크립트보다 먼저, 별도 <script> 로 둔다.
+   같은 블록에 두면 본 스크립트가 문법 오류로 죽을 때 이 코드도 등록되지 않아
+   화면에 아무것도 남지 않는다(구형 모바일 브라우저에서 실제로 겪은 증상). */
+(function(){
+  var BUILD = "2026-08-07.3";
+  window.__BUILD__ = BUILD;
+  var shown = false;
+  function report(kind, msg, extra){
+    if (shown) return; shown = true;
+    var el = document.getElementById("app");
+    if (!el) return;
+    el.innerHTML =
+      '<div class="state" style="text-align:left;max-width:640px;margin:0 auto">' +
+        '<div style="font-weight:700;margin-bottom:.6rem">화면을 그리지 못했습니다</div>' +
+        '<div style="font-size:.85rem;line-height:1.6">' +
+          '<div><b>유형</b> ' + kind + '</div>' +
+          '<div><b>내용</b> ' + String(msg).replace(/[<>&]/g, "") + '</div>' +
+          (extra ? '<div><b>위치</b> ' + String(extra).replace(/[<>&]/g, "") + '</div>' : '') +
+          '<div><b>빌드</b> ' + BUILD + '</div>' +
+          '<div><b>브라우저</b> ' + navigator.userAgent.slice(0, 120) + '</div>' +
+        '</div>' +
+        '<div style="margin-top:1rem;font-size:.85rem">' +
+          '<a href="./index.json" style="color:#1a56db">index.json 직접 열기</a> · ' +
+          '<a href="./reports/" style="color:#1a56db">reports 폴더</a>' +
+        '</div>' +
+      '</div>';
+  }
+  window.addEventListener("error", function(e){
+    report("스크립트 오류", e.message || "unknown", (e.filename || "") + ":" + (e.lineno || "?"));
+  });
+  window.addEventListener("unhandledrejection", function(e){
+    var r = e.reason;
+    report("네트워크/비동기 오류", (r && r.message) || r || "unknown", "");
+  });
+  // 8초 안에 본문이 그려지지 않으면 멈춘 지점을 알려준다
+  setTimeout(function(){
+    var el = document.getElementById("app");
+    if (el && el.innerHTML.indexOf("spinner") >= 0) {
+      report("응답 없음", "8초 안에 목록을 받지 못했습니다. 네트워크 차단 또는 캐시 문제일 수 있습니다.", "");
+    }
+  }, 8000);
+})();
+</script>
+
 <footer><div class="fwrap" id="foot"></div></footer>
 
 <script>
@@ -606,7 +651,7 @@ function parseExec(body){
 }
 
 /* ---------- data ---------- */
-function getJSON(u){return fetch(u,{headers:{Accept:"application/vnd.github+json"}}).then(function(r){
+function getJSON(u){return fetch(u+(u.indexOf("?")<0?"?t=":"&t=")+Date.now(),{headers:{Accept:"application/vnd.github+json"}}).then(function(r){
   if(r.status===403) throw new Error("RATE_LIMIT");
   if(r.status===404) throw new Error("NOT_FOUND");
   if(!r.ok) throw new Error("HTTP "+r.status);
@@ -684,7 +729,7 @@ function foot(doc){
   $("foot").innerHTML = doc
     ? '<span>원본 <a href="https://github.com/'+OWNER+'/'+REPO+'/blob/'+BRANCH+'/docs/reports/'+doc.file+'" target="_blank" rel="noopener">'+doc.file+'</a></span>'+
       '<span><a href="https://github.com/'+OWNER+'/'+REPO+'" target="_blank" rel="noopener">'+OWNER+'/'+REPO+'</a></span>'+
-      '<span>매일 08:00 KST 자동 생성</span>'
+      '<span>매일 08:00 KST 자동 생성</span>'+'<span>build '+(window.__BUILD__||'?')+'</span>'
     : '<span><a href="https://github.com/'+OWNER+'/'+REPO+'" target="_blank" rel="noopener">'+OWNER+'/'+REPO+'</a></span>';
 }
 
