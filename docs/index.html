@@ -1,0 +1,779 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>On-device AI 동향 브리핑</title>
+<meta name="description" content="On-device AI 모델 최적화·추론 최적화·업계/학계 동향 일일 브리핑">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📡</text></svg>">
+<style>
+:root{
+  --bg:#f6f7f9; --surface:#fff; --surface-2:#f1f3f6; --border:#e3e6eb; --border-2:#d5dae2;
+  --text:#15181d; --text-2:#586173; --text-3:#8a93a3;
+  --accent:#1a56db; --accent-soft:#e9f0ff;
+  --warn:#b45309; --warn-soft:#fef6e3;
+  --live:#dc2626; --ok:#059669;
+  --shadow:0 1px 2px rgba(15,23,42,.05), 0 8px 24px -12px rgba(15,23,42,.14);
+  --shadow-h:0 2px 6px rgba(15,23,42,.07), 0 18px 40px -16px rgba(15,23,42,.24);
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","Malgun Gothic","Apple SD Gothic Neo",Roboto,sans-serif;
+  --c1:#6366f1; --c2:#0ea5e9; --c3:#f43f5e; --c4:#8b5cf6; --c5:#f59e0b; --c6:#10b981;
+}
+:root:not([data-theme=light]){
+  @media (prefers-color-scheme:dark){
+    --bg:#0b0e13; --surface:#141920; --surface-2:#1b212a; --border:#272e3a; --border-2:#333c4a;
+    --text:#e7edf4; --text-2:#a0abbb; --text-3:#6e7889;
+    --accent:#6693ff; --accent-soft:#16244d;
+    --warn:#fbbf24; --warn-soft:#3a2e11;
+    --live:#f87171; --ok:#34d399;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+    --shadow-h:0 2px 6px rgba(0,0,0,.5), 0 18px 40px -16px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme=dark]{
+  --bg:#0b0e13; --surface:#141920; --surface-2:#1b212a; --border:#272e3a; --border-2:#333c4a;
+  --text:#e7edf4; --text-2:#a0abbb; --text-3:#6e7889;
+  --accent:#6693ff; --accent-soft:#16244d;
+  --warn:#fbbf24; --warn-soft:#3a2e11;
+  --live:#f87171; --ok:#34d399;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+  --shadow-h:0 2px 6px rgba(0,0,0,.5), 0 18px 40px -16px rgba(0,0,0,.8);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%; scroll-behavior:smooth}
+body{margin:0; background:var(--bg); color:var(--text); font-family:var(--sans); font-size:16px; line-height:1.7}
+a{color:inherit}
+
+/* ================= header ================= */
+header{
+  position:sticky; top:0; z-index:50;
+  background:color-mix(in srgb,var(--surface) 86%,transparent);
+  backdrop-filter:saturate(180%) blur(14px);
+  border-bottom:1px solid var(--border);
+}
+.hwrap{max-width:1200px; margin:0 auto; padding:.65rem 1.2rem; display:flex; gap:.8rem; align-items:center}
+.brand{display:flex; align-items:center; gap:.55rem; font-weight:700; letter-spacing:-.02em; margin-right:auto; text-decoration:none; font-size:.98rem}
+.brand .dot{width:8px;height:8px;border-radius:50%;background:var(--ok);flex:none}
+.brand .dot.live{background:var(--live); animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+select,button.ghost{
+  font:inherit; font-size:.82rem; color:var(--text); background:var(--surface-2);
+  border:1px solid var(--border); border-radius:8px; padding:.38rem .6rem; cursor:pointer;
+}
+select:hover,button.ghost:hover{border-color:var(--accent)}
+button.ghost{min-width:2.3rem}
+
+/* ================= shell ================= */
+.wrap{max-width:1200px; margin:0 auto; padding:0 1.2rem}
+.pad{padding-top:2rem; padding-bottom:5rem}
+
+/* ================= hero ================= */
+.hero{
+  background:var(--surface); border:1px solid var(--border); border-radius:18px;
+  padding:1.9rem 2rem; margin-bottom:1.5rem; box-shadow:var(--shadow); position:relative; overflow:hidden;
+}
+.hero::before{
+  content:""; position:absolute; inset:0 0 auto 0; height:4px;
+  background:linear-gradient(90deg,var(--c1),var(--c2),var(--c4),var(--c6));
+}
+@media(max-width:640px){ .hero{padding:1.4rem 1.2rem} }
+.hero .kicker{font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); font-weight:700}
+.hero h1{margin:.5rem 0 .5rem; font-size:1.85rem; line-height:1.25; letter-spacing:-.03em}
+@media(max-width:640px){ .hero h1{font-size:1.4rem} }
+.hero .meta{color:var(--text-2); font-size:.86rem; display:flex; flex-wrap:wrap; gap:.4rem 1rem}
+.hero .meta b{color:var(--text); font-weight:600}
+
+/* ================= banners ================= */
+.banner{
+  border:1px solid var(--border); border-left:3px solid var(--accent); background:var(--surface);
+  border-radius:12px; padding:.85rem 1.1rem; margin-bottom:1.1rem; font-size:.88rem; box-shadow:var(--shadow);
+}
+.banner.live{border-left-color:var(--live)}
+.banner.warn{border-left-color:var(--warn); background:var(--warn-soft)}
+.banner h4{margin:0 0 .25rem; font-size:.9rem; display:flex; align-items:center; gap:.4rem}
+.banner p{margin:0; color:var(--text-2)}
+.banner a{color:var(--accent); font-weight:600; text-decoration:none}
+
+/* ================= section title ================= */
+.sec-title{display:flex; align-items:baseline; gap:.7rem; margin:2.6rem 0 1.1rem}
+.sec-title h2{margin:0; font-size:1.18rem; letter-spacing:-.02em}
+.sec-title .count{font-size:.78rem; color:var(--text-3)}
+.sec-title .line{flex:1; height:1px; background:var(--border)}
+.sec-title a.all{font-size:.82rem; font-weight:650; color:var(--accent); text-decoration:none; white-space:nowrap}
+.sec-title a.all:hover{text-decoration:underline}
+
+/* executive summary 상세 */
+.execfull{display:flex; flex-direction:column; gap:1.2rem}
+.execfull .blk{background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:1.5rem 1.7rem; box-shadow:var(--shadow); scroll-margin-top:5rem}
+@media(max-width:640px){ .execfull .blk{padding:1.1rem 1.1rem} }
+.execfull .blk .n{width:28px;height:28px;border-radius:9px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-size:.85rem;font-weight:700;margin-bottom:.7rem}
+.execfull .blk h3{margin:0 0 .7rem; font-size:1.12rem; line-height:1.45; letter-spacing:-.02em; padding:0; border:0}
+.execfull .blk .desc{font-size:.94rem; color:var(--text-2)}
+.execfull .blk .desc p{margin:.5rem 0}
+.execfull .blk .desc p:first-child{margin-top:0}
+.execfull .blk .desc strong{color:var(--text)}
+.execfull .blk .desc a{color:var(--accent); text-decoration:none; border-bottom:1px solid color-mix(in srgb,var(--accent) 32%,transparent)}
+.execfull .blk .desc code{font-family:var(--mono); font-size:.86em; background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:.1em .38em}
+.execfull .blk .ev{margin:1.1rem 0 0; padding:.9rem 1.1rem; background:var(--surface-2); border-radius:10px; border:1px dashed var(--border-2)}
+.execfull .blk .ev .evlabel{font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; font-weight:700; color:var(--text-3); margin-bottom:.5rem}
+.execfull .blk .ev ul{margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:.42rem}
+.execfull .blk .ev li{font-size:.87rem; padding-left:1.05rem; position:relative; line-height:1.5}
+.execfull .blk .ev li::before{content:"→"; position:absolute; left:0; color:var(--text-3); font-size:.8rem}
+.execfull .blk .ev a{color:var(--accent); text-decoration:none; border-bottom:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
+.execfull .blk .ev a:hover{border-bottom-color:var(--accent)}
+.execfull .blk .ev .ext{font-size:.7em; margin-left:.25em; opacity:.65; border:0}
+.execfull .blk .ev .noref{color:var(--text-2)}
+.execfull .blk .so{margin:1rem 0 0; padding:.9rem 1.1rem; background:var(--surface-2); border-radius:10px; border-left:3px solid var(--accent); font-size:.92rem}
+.execfull .blk .so b{color:var(--accent)}
+.execfull .blk .so p{margin:.35rem 0 0; display:inline}
+.execfull .blk .so p:first-of-type{display:inline}
+.execfull .blk .so strong{color:var(--text)}
+.exec .n{
+  width:26px;height:26px;border-radius:8px;background:var(--accent-soft);color:var(--accent);
+  display:grid;place-items:center;font-size:.8rem;font-weight:700;flex:none;
+}
+.exec h3{margin:0; font-size:.98rem; line-height:1.45; letter-spacing:-.01em}
+.exec .desc{font-size:.86rem; color:var(--text-2); margin:0}
+.exec .so{
+  font-size:.85rem; margin:0; padding:.6rem .8rem; background:var(--surface-2);
+  border-radius:9px; border-left:2px solid var(--accent);
+}
+.exec .so b{color:var(--accent)}
+
+/* ================= action table ================= */
+.panel{background:var(--surface); border:1px solid var(--border); border-radius:14px; box-shadow:var(--shadow); overflow:hidden}
+.panel .phead{padding:.9rem 1.2rem; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:.5rem; font-weight:650; font-size:.95rem}
+.panel .pbody{padding:0}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse; width:100%; font-size:.85rem; min-width:600px}
+th,td{padding:.7rem .95rem; text-align:left; border-bottom:1px solid var(--border); vertical-align:top}
+th{background:var(--surface-2); font-weight:600; white-space:nowrap; color:var(--text-2); font-size:.78rem; letter-spacing:.02em}
+tr:last-child td{border-bottom:0}
+
+/* ================= cards ================= */
+.cards{display:grid; gap:1.3rem; grid-template-columns:repeat(auto-fill,minmax(290px,1fr))}
+.cards.three{grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
+.card{
+  background:var(--surface); border:1px solid var(--border); border-radius:16px;
+  overflow:hidden; display:flex; flex-direction:column; text-decoration:none; color:inherit;
+  box-shadow:var(--shadow); transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.card:hover{transform:translateY(-4px); box-shadow:var(--shadow-h); border-color:var(--border-2)}
+
+/* --- thumbnail --- */
+.thumb{
+  position:relative; aspect-ratio:16/9; display:grid; place-items:center; overflow:hidden;
+  background:linear-gradient(135deg, var(--tc), color-mix(in srgb, var(--tc) 48%, #0b0e13));
+}
+.thumb .motif{position:absolute; inset:0; width:100%; height:100%; opacity:.3}
+.thumb .glyph{
+  position:relative; font-size:2.7rem; line-height:1;
+  filter:drop-shadow(0 3px 10px rgba(0,0,0,.4));
+  transition:transform .25s ease;
+}
+.card:hover .thumb .glyph{transform:scale(1.09)}
+.thumb .num{
+  position:relative; font-size:2.6rem; font-weight:800; color:#fff; letter-spacing:-.04em;
+  text-shadow:0 3px 12px rgba(0,0,0,.35); transition:transform .25s ease;
+}
+.card:hover .thumb .num{transform:scale(1.09)}
+.thumb .tag{
+  position:absolute; left:.75rem; bottom:.7rem; z-index:2;
+  font-size:.66rem; font-weight:700; letter-spacing:.09em; text-transform:uppercase;
+  color:#fff; background:rgba(0,0,0,.32); backdrop-filter:blur(4px);
+  padding:.2rem .5rem; border-radius:20px;
+}
+
+/* --- card body --- */
+.card .inner{padding:1rem 1.15rem 1.1rem; display:flex; flex-direction:column; flex:1; gap:.55rem}
+.card h3{
+  margin:0; font-size:1.05rem; letter-spacing:-.02em; line-height:1.42; font-weight:650;
+  display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
+}
+.card .foot{
+  margin-top:auto; padding-top:.8rem; display:flex; align-items:center; justify-content:space-between;
+  font-size:.79rem; color:var(--text-3); border-top:1px solid var(--border);
+}
+.card .foot .go{font-weight:650; color:var(--accent)}
+.badge{font-size:.7rem; font-weight:700; padding:.14rem .5rem; border-radius:20px; background:var(--surface-2); color:var(--text-2)}
+
+/* small cards row */
+.mini{display:grid; gap:1.1rem; grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.mini .thumb{aspect-ratio:21/9}
+.mini .thumb .glyph{font-size:1.9rem}
+.mini .card h3{font-size:.95rem; -webkit-line-clamp:2}
+
+/* ================= archive ================= */
+.arch{display:flex; flex-wrap:wrap; gap:.55rem}
+.arch a{
+  text-decoration:none; font-size:.83rem; padding:.45rem .8rem; border-radius:20px;
+  background:var(--surface); border:1px solid var(--border); color:var(--text-2);
+}
+.arch a:hover{border-color:var(--accent); color:var(--accent)}
+.arch a.cur{background:var(--accent-soft); border-color:var(--accent); color:var(--accent); font-weight:650}
+
+/* ================= detail ================= */
+.crumb{display:flex; align-items:center; gap:.5rem; font-size:.83rem; color:var(--text-3); margin-bottom:1rem; flex-wrap:wrap}
+.crumb a{color:var(--text-2); text-decoration:none}
+.crumb a:hover{color:var(--accent)}
+.dhead{border-radius:18px; padding:1.7rem 2rem; margin-bottom:1.5rem; color:#fff; position:relative; overflow:hidden}
+@media(max-width:640px){ .dhead{padding:1.3rem 1.2rem} }
+.dhead .dmotif{position:absolute; inset:0; width:100%; height:100%; opacity:.18; pointer-events:none}
+.dhead .dinner{position:relative; z-index:1}
+.dhead .cat{font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; font-weight:700; opacity:.85}
+.dhead h1{margin:.45rem 0 .35rem; font-size:1.65rem; letter-spacing:-.03em; line-height:1.25}
+@media(max-width:640px){ .dhead h1{font-size:1.3rem} }
+.dhead p{margin:0; font-size:.86rem; opacity:.9}
+.dlayout{display:grid; grid-template-columns:1fr; gap:1.6rem}
+@media(min-width:1000px){ .dlayout{grid-template-columns:1fr 210px; align-items:start} }
+article{background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:1.6rem 1.8rem 2.2rem; box-shadow:var(--shadow); overflow-wrap:anywhere}
+@media(max-width:640px){ article{padding:1.1rem 1rem 1.8rem} }
+article h2{font-size:1.15rem; margin:2rem 0 .8rem; padding-top:1rem; border-top:1px solid var(--border); scroll-margin-top:5rem}
+article h2:first-child{margin-top:0; border-top:0; padding-top:0}
+article h3{font-size:1.02rem; margin:2rem 0 .6rem; scroll-margin-top:5rem; letter-spacing:-.01em; padding-left:.7rem; border-left:3px solid var(--accent)}
+article h4{font-size:.92rem; margin:1.1rem 0 .4rem; color:var(--text-2)}
+article p{margin:.65rem 0}
+article ul,article ol{margin:.55rem 0; padding-left:1.3rem}
+article li{margin:.3rem 0}
+article a{color:var(--accent); text-decoration:none; border-bottom:1px solid color-mix(in srgb,var(--accent) 32%,transparent)}
+article a:hover{border-bottom-color:var(--accent)}
+article hr{border:0; border-top:1px solid var(--border); margin:1.8rem 0}
+article blockquote{margin:1rem 0; padding:.7rem 1rem; border-left:3px solid var(--border); background:var(--surface-2); border-radius:0 8px 8px 0; color:var(--text-2); font-size:.9rem}
+article code{font-family:var(--mono); font-size:.86em; background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:.1em .38em}
+article pre{background:var(--surface-2); border:1px solid var(--border); border-radius:8px; padding:.9rem 1rem; overflow-x:auto; font-size:.83rem}
+article pre code{background:none; border:0; padding:0}
+article .tablewrap{margin:1rem 0; border:1px solid var(--border); border-radius:8px}
+nav.toc{position:sticky; top:4.4rem; font-size:.82rem}
+@media(max-width:999px){ nav.toc{display:none} }
+nav.toc .label{font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; color:var(--text-3); margin-bottom:.55rem; font-weight:700}
+nav.toc a{display:block; padding:.32rem .6rem; margin-left:-.6rem; border-radius:6px; color:var(--text-2); text-decoration:none; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+nav.toc a:hover{background:var(--surface-2); color:var(--text)}
+nav.toc a.active{background:var(--accent-soft); color:var(--accent); font-weight:650}
+.pager{display:flex; gap:.8rem; margin-top:1.5rem; flex-wrap:wrap}
+.pager a{
+  flex:1; min-width:220px; text-decoration:none; background:var(--surface); border:1px solid var(--border);
+  border-radius:12px; padding:.9rem 1.1rem; box-shadow:var(--shadow); transition:border-color .15s;
+}
+.pager a:hover{border-color:var(--accent)}
+.pager .dir{font-size:.72rem; color:var(--text-3); letter-spacing:.06em; text-transform:uppercase; font-weight:700}
+.pager .t{font-size:.92rem; margin-top:.2rem; color:var(--text)}
+
+/* ================= states ================= */
+.state{padding:5rem 1rem; text-align:center; color:var(--text-2)}
+.spinner{width:26px;height:26px;margin:0 auto 1rem;border-radius:50%;border:2.5px solid var(--border);border-top-color:var(--accent);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.state code{font-family:var(--mono); font-size:.82rem; background:var(--surface-2); padding:.15em .4em; border-radius:5px}
+footer{border-top:1px solid var(--border); margin-top:3rem}
+footer .fwrap{max-width:1200px; margin:0 auto; padding:1.6rem 1.2rem 3rem; font-size:.78rem; color:var(--text-3); display:flex; flex-wrap:wrap; gap:.4rem 1.2rem}
+footer a{color:var(--text-2)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hwrap">
+    <a class="brand" href="#/">
+      <span class="dot" id="statusDot"></span>
+      <span>On-device AI 동향 브리핑</span>
+    </a>
+    <select id="picker" aria-label="브리핑 날짜"><option>불러오는 중…</option></select>
+    <button class="ghost" id="themeBtn" title="테마 전환" aria-label="테마 전환">◐</button>
+    <button class="ghost" id="reloadBtn" title="새로고침" aria-label="새로고침">↻</button>
+  </div>
+</header>
+
+<div id="app" class="wrap pad">
+  <div class="state"><div class="spinner"></div>리포트를 불러오는 중…</div>
+</div>
+
+<footer><div class="fwrap" id="foot"></div></footer>
+
+<script>
+(function(){
+"use strict";
+
+var OWNER="Samiepapa", REPO="On-device-AI-Briefing", BRANCH="main";
+var API="https://api.github.com/repos/"+OWNER+"/"+REPO+"/contents/";
+var RAW="https://raw.githubusercontent.com/"+OWNER+"/"+REPO+"/"+BRANCH+"/";
+var REPORT_RE=/^(\d{4}-\d{2}-\d{2})-on-device-ai-briefing\.md$/;
+var $=function(id){return document.getElementById(id);};
+
+/* ---------- theme ---------- */
+try{ var sv=localStorage.getItem("theme"); if(sv) document.documentElement.setAttribute("data-theme",sv); }catch(e){}
+$("themeBtn").onclick=function(){
+  var cur=document.documentElement.getAttribute("data-theme");
+  if(!cur) cur=matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light";
+  var nx=cur==="dark"?"light":"dark";
+  document.documentElement.setAttribute("data-theme",nx);
+  try{ localStorage.setItem("theme",nx); }catch(e){}
+};
+
+/* ---------- markdown ---------- */
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function inline(s){
+  s=esc(s);
+  s=s.replace(/`([^`]+)`/g,function(m,c){return "<code>"+c+"</code>";});
+  s=s.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g,function(m,t,u){return '<a href="'+u+'" target="_blank" rel="noopener">'+t+"</a>";});
+  s=s.replace(/(^|[\s(])(https?:\/\/[^\s<)]+)/g,function(m,p,u){return p+'<a href="'+u+'" target="_blank" rel="noopener">'+u+"</a>";});
+  s=s.replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>");
+  s=s.replace(/(^|[^*])\*([^*\n]+)\*/g,"$1<em>$2</em>");
+  return s;
+}
+function cells(l){return l.trim().replace(/^\|/,"").replace(/\|$/,"").split("|").map(function(c){return c.trim();});}
+function isSep(l){return /^\s*\|?[\s:-]*-[-\s|:]*\|?\s*$/.test(l)&&l.indexOf("-")>=0;}
+function md2html(src){
+  var L=src.replace(/\r\n?/g,"\n").split("\n"), out=[], i=0;
+  function list(tag,items){out.push("<"+tag+">"+items.map(function(x){return "<li>"+inline(x)+"</li>";}).join("")+"</"+tag+">");}
+  while(i<L.length){
+    var ln=L[i];
+    if(/^\s*```/.test(ln)){var b=[];i++;while(i<L.length&&!/^\s*```/.test(L[i])){b.push(L[i]);i++;}i++;out.push("<pre><code>"+esc(b.join("\n"))+"</code></pre>");continue;}
+    if(ln.indexOf("|")>=0&&i+1<L.length&&isSep(L[i+1])){
+      var hd=cells(ln);i+=2;var rows=[];
+      while(i<L.length&&L[i].indexOf("|")>=0&&L[i].trim()!==""){rows.push(cells(L[i]));i++;}
+      out.push('<div class="tablewrap"><table><thead><tr>'+hd.map(function(c){return "<th>"+inline(c)+"</th>";}).join("")+"</tr></thead><tbody>"+
+        rows.map(function(r){return "<tr>"+r.map(function(c){return "<td>"+inline(c)+"</td>";}).join("")+"</tr>";}).join("")+"</tbody></table></div>");
+      continue;
+    }
+    var hm=/^(#{1,6})\s+(.*)$/.exec(ln);
+    if(hm){out.push("<h"+hm[1].length+">"+inline(hm[2].trim())+"</h"+hm[1].length+">");i++;continue;}
+    if(/^\s*(---|\*\*\*|___)\s*$/.test(ln)){out.push("<hr>");i++;continue;}
+    if(/^\s*>/.test(ln)){var q=[];while(i<L.length&&/^\s*>/.test(L[i])){q.push(L[i].replace(/^\s*>\s?/,""));i++;}out.push("<blockquote>"+md2html(q.join("\n"))+"</blockquote>");continue;}
+    if(/^\s*[-*+]\s+/.test(ln)){var u=[];while(i<L.length&&/^\s*[-*+]\s+/.test(L[i])){u.push(L[i].replace(/^\s*[-*+]\s+/,""));i++;}list("ul",u);continue;}
+    if(/^\s*\d+[.)]\s+/.test(ln)){var o=[];while(i<L.length&&/^\s*\d+[.)]\s+/.test(L[i])){o.push(L[i].replace(/^\s*\d+[.)]\s+/,""));i++;}list("ol",o);continue;}
+    if(ln.trim()===""){i++;continue;}
+    var p=[];
+    while(i<L.length&&L[i].trim()!==""&&!/^(#{1,6}\s|\s*[-*+]\s|\s*\d+[.)]\s|\s*>|\s*```)/.test(L[i])&&!/^\s*(---|\*\*\*|___)\s*$/.test(L[i])){p.push(L[i]);i++;}
+    if(p.length) out.push("<p>"+inline(p.join(" "))+"</p>");
+  }
+  return out.join("\n");
+}
+function stripMd(s){
+  return s.replace(/\[([^\]]+)\]\([^)]*\)/g,"$1").replace(/[*`>#]/g,"").replace(/\s+/g," ").trim();
+}
+
+/* ---------- section catalogue ---------- */
+/* 리포트의 "## " 제목을 아래 정의에 매칭한다. 매칭 실패해도 기타 섹션으로 살아남는다. */
+var DOMAINS=[
+  {key:"model",  re:/모델\s*최적화/,        cat:"MODEL OPTIMIZATION", icon:"🧩", color:"var(--c1)", desc:"Quantization · Pruning · Distillation · SLM 아키텍처"},
+  {key:"infer",  re:/Inference\s*최적화/i,  cat:"INFERENCE",          icon:"⚙️", color:"var(--c2)", desc:"런타임 · 벤더 SDK · 디코딩 · KV cache"},
+  {key:"industry",re:/업계\s*동향/,          cat:"INDUSTRY",           icon:"🏭", color:"var(--c3)", desc:"Apple · Google · Qualcomm · MediaTek · 중국 OEM"},
+  {key:"academia",re:/학계\s*동향/,          cat:"ACADEMIA",           icon:"🎓", color:"var(--c4)", desc:"arXiv · 주요 학회 · 산업 연구소"},
+  {key:"hf",     re:/HuggingFace/i,         cat:"HUGGINGFACE",        icon:"🤗", color:"var(--c5)", desc:"트렌딩 · 다운로드 급증 · on-device 포맷"},
+  {key:"gh",     re:/GitHub/i,              cat:"GITHUB",             icon:"⭐", color:"var(--c6)", desc:"star 상위 · 급증 repo · major release"}
+];
+/* 도메인별 썸네일 모티프 — 외부 이미지 없이 SVG로 생성한다 (CDN 차단 환경 대비) */
+var MOTIF={
+  model:   '<g fill="none" stroke="#fff" stroke-width="2.2"><rect x="58" y="24" width="84" height="64" rx="8"/><rect x="71" y="35" width="58" height="42" rx="6"/><rect x="84" y="46" width="32" height="20" rx="4"/><path d="M22 56h30M148 56h30"/></g>',
+  infer:   '<g fill="none" stroke="#fff" stroke-width="2.2"><path d="M8 60h34l10-26 14 52 12-38 11 26 10-14h93"/><circle cx="42" cy="60" r="3.5" fill="#fff"/><circle cx="152" cy="60" r="3.5" fill="#fff"/></g>',
+  industry:'<g fill="#fff"><rect x="26" y="66" width="19" height="38" rx="2"/><rect x="55" y="48" width="19" height="56" rx="2"/><rect x="84" y="58" width="19" height="46" rx="2"/><rect x="113" y="30" width="19" height="74" rx="2"/><rect x="142" y="44" width="19" height="60" rx="2"/></g><path d="M35 60l29-16 29 8 29-26 29 12" fill="none" stroke="#fff" stroke-width="2.2"/>',
+  academia:'<g fill="none" stroke="#fff" stroke-width="2.2"><circle cx="56" cy="38" r="9"/><circle cx="118" cy="28" r="9"/><circle cx="96" cy="80" r="9"/><circle cx="152" cy="66" r="9"/><circle cx="34" cy="82" r="9"/><path d="M65 35l44-6M62 45l30 27M105 77l38-7M125 35l22 24M43 78l44-3"/></g>',
+  hf:      '<g><path d="M24 92L58 78L92 58L126 62L160 26" fill="none" stroke="#fff" stroke-width="2.4"/><g fill="#fff"><circle cx="24" cy="92" r="5"/><circle cx="58" cy="78" r="5"/><circle cx="92" cy="58" r="5"/><circle cx="126" cy="62" r="5"/><circle cx="160" cy="26" r="6.5"/></g></g>',
+  gh:      '<g fill="none" stroke="#fff" stroke-width="2.2"><path d="M100 20l10 21 23 3-17 16 4 23-20-11-20 11 4-23-17-16 23-3z"/><circle cx="40" cy="86" r="9"/><circle cx="160" cy="86" r="9"/><path d="M49 83l35-13M151 83l-35-13"/></g>',
+  exec:    '<g fill="none" stroke="#fff" stroke-width="2.2"><circle cx="100" cy="56" r="38"/><circle cx="100" cy="56" r="23"/><path d="M100 4v18M100 90v18M42 56H24M176 56h-18"/></g>',
+  tail:    '<g fill="none" stroke="#fff" stroke-width="2.2"><rect x="60" y="22" width="80" height="68" rx="7"/><path d="M74 42h52M74 56h52M74 70h32"/></g>'
+};
+/* 카드 제목에서 선행 번호와 이모지를 걷어낸다 — 아이콘은 썸네일이 담당한다 */
+function cleanTitle(t){
+  return t.replace(/^\d+\.\s*/,"").replace(/^[\p{Extended_Pictographic}️‍]+\s*/u,"").trim();
+}
+function thumb(key,color,glyph,tag,num){
+  return '<div class="thumb" style="--tc:'+color+'">'+
+    '<svg class="motif" viewBox="0 0 200 112" preserveAspectRatio="xMidYMid slice" aria-hidden="true">'+(MOTIF[key]||MOTIF.tail)+"</svg>"+
+    (num!=null ? '<span class="num">'+esc(num)+"</span>" : '<span class="glyph">'+glyph+"</span>")+
+    (tag ? '<span class="tag">'+esc(tag)+"</span>" : "")+
+    "</div>";
+}
+
+var EXEC_RE=/Executive\s*Summary/i, ACT_RE=/즉시\s*검토|Action\s*Required/i;
+var TAIL=[
+  {re:/워치리스트/,   cat:"WATCHLIST", icon:"📌", color:"var(--text-2)"},
+  {re:/다가오는\s*일정/,cat:"CALENDAR",  icon:"🗓", color:"var(--text-2)"},
+  {re:/수집\s*한계/,  cat:"LIMITATIONS",icon:"⚠️", color:"var(--text-2)"}
+];
+
+function parseReport(md){
+  var L=md.replace(/\r\n?/g,"\n").split("\n");
+  var doc={title:"", meta:[], sections:[]}, cur=null, i=0;
+  // 문서 제목 + 상단 메타(> 인용)
+  for(; i<L.length; i++){
+    if(/^#\s+/.test(L[i])){ doc.title=L[i].replace(/^#\s+/,"").trim(); continue; }
+    if(/^\s*>/.test(L[i])){ doc.meta.push(L[i].replace(/^\s*>\s?/,"").trim()); continue; }
+    if(/^##\s+/.test(L[i])) break;
+    if(L[i].trim()!=="" && doc.title) break;
+  }
+  for(; i<L.length; i++){
+    var h=/^##\s+(.*)$/.exec(L[i]);
+    if(h){ cur={title:h[1].trim(), lines:[]}; doc.sections.push(cur); continue; }
+    if(cur) cur.lines.push(L[i]);
+  }
+  doc.sections.forEach(function(s,n){
+    s.body=s.lines.join("\n").replace(/^\s*-{3,}\s*$/gm,"").trim();
+    s.slug="s"+n;
+    s.plain=stripMd(s.title);
+    // 표 본문 행 (헤더 제외) — 표 기반 섹션의 미리보기·건수에 쓴다
+    var tRows=[], seenHead=false;
+    for(var r=0;r<s.lines.length;r++){
+      var l=s.lines[r];
+      if(isSep(l)){ seenHead=true; continue; }
+      if(seenHead && l.indexOf("|")>=0 && l.trim()!==""){ tRows.push(cells(l)); }
+      else if(seenHead && l.trim()==="") seenHead=false;
+    }
+    s.rowCount=tRows.length;
+
+    // "### ▪ Foo" 형태의 실제 항목만 센다 (수집 한계·일정 등 부가 h3는 제외)
+    var bullets=[];
+    s.lines.forEach(function(l){
+      var m=/^###\s+▪\s*(.+)$/.exec(l);
+      if(m) bullets.push(stripMd(m[1]));
+    });
+    if(bullets.length){
+      s.items=bullets;
+      s.count=bullets.length;
+    } else if(tRows.length){
+      // 표 기반 섹션(HuggingFace·GitHub·Action)은 첫 열을 항목명으로 쓴다
+      s.items=tRows.map(function(c){return stripMd(c[0]);}).filter(Boolean);
+      s.count=tRows.length;
+    } else {
+      s.items=[]; s.count=0;
+    }
+    // 리드문: 첫 인용/문단
+    var lead="";
+    for(var k=0;k<s.lines.length;k++){
+      var t=s.lines[k].trim();
+      if(!t||/^-{3,}$/.test(t)) continue;
+      if(/^###/.test(t)) break;
+      lead+=(lead?" ":"")+t.replace(/^>\s?/,"");
+      if(lead.length>180) break;
+    }
+    s.lead=stripMd(lead);
+    // 분류
+    s.kind="other"; s.meta=null;
+    if(EXEC_RE.test(s.title)) s.kind="exec";
+    else if(ACT_RE.test(s.title)) s.kind="action";
+    else {
+      for(var d=0;d<DOMAINS.length;d++){ if(DOMAINS[d].re.test(s.title)){ s.kind="domain"; s.meta=DOMAINS[d]; break; } }
+      if(s.kind==="other"){ for(var t2=0;t2<TAIL.length;t2++){ if(TAIL[t2].re.test(s.title)){ s.kind="tail"; s.meta=TAIL[t2]; break; } } }
+    }
+  });
+  return doc;
+}
+
+function parseExec(body){
+  // "**1. 헤드라인**\n 본문\n**근거:** …\n**시사점:** …" 를 3건으로 쪼갠다
+  var parts=body.split(/\n(?=\*\*\d+\.\s)/).filter(function(p){return /^\*\*\d+\./.test(p.trim());});
+  return parts.map(function(p,n){
+    var head=/^\*\*(\d+)\.\s*([\s\S]*?)\*\*/.exec(p);
+    var rest = head ? p.slice(head[0].length) : p;
+
+    // 근거 / 시사점 라벨 위치로 3등분 (라벨이 없어도 동작해야 한다)
+    var iEv = rest.search(/\*\*근거:?\*\*/);
+    var iSo = rest.search(/\*\*시사점:?\*\*/);
+    var desc, ev="", so="";
+    var cut = [iEv, iSo].filter(function(x){return x>=0;});
+    desc = rest.slice(0, cut.length ? Math.min.apply(null, cut) : rest.length);
+    if(iEv>=0){
+      var evEnd = (iSo>iEv) ? iSo : rest.length;
+      ev = rest.slice(iEv, evEnd).replace(/^\*\*근거:?\*\*\s*/,"");
+    }
+    if(iSo>=0) so = rest.slice(iSo).replace(/^\*\*시사점:?\*\*\s*/,"");
+
+    // 근거 줄을 개별 항목으로 쪼갠다.
+    // 링크 안에 " · " 가 들어갈 수 있으므로 마크다운 링크를 먼저 통째로 잡고,
+    // 그 사이의 평문만 · 로 나눈다.
+    var toks = ev.match(/\[[^\]]*\]\([^)\s]*\)|[^·]+/g) || [];
+    var evItems = toks.map(function(x){return x.trim();}).filter(Boolean).map(function(x){
+      var l=/^\[([^\]]+)\]\(([^)\s]+)\)$/.exec(x);
+      return l ? {label:l[1], url:l[2]} : {label:stripMd(x), url:null};
+    }).filter(function(e){ return e.label.length>1; });
+
+    return {
+      n: head?head[1]:String(n+1),
+      title: head?stripMd(head[2]):"",
+      desc: stripMd(desc),              // 카드용 — 평문
+      so: stripMd(so),
+      descRaw: desc.trim(),             // 상세용 — 마크다운 보존(링크·강조)
+      soRaw: so.trim(),
+      evRaw: ev.trim(),
+      ev: evItems
+    };
+  });
+}
+
+/* ---------- data ---------- */
+function getJSON(u){return fetch(u,{headers:{Accept:"application/vnd.github+json"}}).then(function(r){
+  if(r.status===403) throw new Error("RATE_LIMIT");
+  if(r.status===404) throw new Error("NOT_FOUND");
+  if(!r.ok) throw new Error("HTTP "+r.status);
+  return r.json();});}
+function getText(u){return fetch(u+"?t="+Date.now()).then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.text();});}
+
+var S={reports:[], wipDate:null, cache:{}, date:null, doc:null};
+
+function loadIndex(){
+  return getJSON(API+"reports?ref="+BRANCH).then(function(items){
+    S.reports=items.filter(function(f){return f.type==="file"&&REPORT_RE.test(f.name);})
+      .map(function(f){return {date:REPORT_RE.exec(f.name)[1], name:f.name};})
+      .sort(function(a,b){return a.date<b.date?1:-1;});
+    return getJSON(API+"reports/_wip?ref="+BRANCH).then(function(d){
+      var ds=d.filter(function(x){return x.type==="dir";}).map(function(x){return x.name;}).sort();
+      S.wipDate=ds.length?ds[ds.length-1]:null;
+    }).catch(function(){S.wipDate=null;});
+  });
+}
+function loadReport(date){
+  if(S.cache[date]) return Promise.resolve(S.cache[date]);
+  var rep=S.reports.filter(function(r){return r.date===date;})[0];
+  if(!rep) return Promise.reject(new Error("리포트 없음: "+date));
+  return getText(RAW+"reports/"+rep.name).then(function(md){
+    var doc=parseReport(md); doc.file=rep.name; doc.date=date;
+    S.cache[date]=doc; return doc;
+  });
+}
+
+/* ---------- chrome ---------- */
+function chrome(){
+  var latest=S.reports.length?S.reports[0].date:null;
+  var running=S.wipDate && S.wipDate!==latest;
+  $("statusDot").className=running?"dot live":"dot";
+  var sel=$("picker");
+  sel.innerHTML="";
+  if(!S.reports.length){ sel.innerHTML="<option>리포트 없음</option>"; sel.disabled=true; return; }
+  sel.disabled=false;
+  S.reports.forEach(function(r,n){
+    var o=document.createElement("option");
+    o.value=r.date; o.textContent=r.date+(n===0?"  (최신)":"");
+    sel.appendChild(o);
+  });
+  sel.onchange=function(){ location.hash="#/"+sel.value; };
+}
+function liveBanner(){
+  var latest=S.reports.length?S.reports[0].date:null;
+  if(!(S.wipDate&&S.wipDate!==latest)) return "";
+  return '<div class="banner live"><h4>🔴 '+S.wipDate+' 브리핑 생성 중</h4>'+
+    '<p>완료된 섹션이 순서대로 올라옵니다. <a href="https://github.com/'+OWNER+'/'+REPO+'/blob/'+BRANCH+'/reports/_wip/'+S.wipDate+'/STATUS.md" target="_blank" rel="noopener">진행 상황 보기 →</a></p></div>';
+}
+function foot(doc){
+  $("foot").innerHTML = doc
+    ? '<span>원본 <a href="https://github.com/'+OWNER+'/'+REPO+'/blob/'+BRANCH+'/reports/'+doc.file+'" target="_blank" rel="noopener">'+doc.file+'</a></span>'+
+      '<span><a href="https://github.com/'+OWNER+'/'+REPO+'" target="_blank" rel="noopener">'+OWNER+'/'+REPO+'</a></span>'+
+      '<span>매일 08:00 KST 자동 생성</span>'
+    : '<span><a href="https://github.com/'+OWNER+'/'+REPO+'" target="_blank" rel="noopener">'+OWNER+'/'+REPO+'</a></span>';
+}
+
+/* ---------- views ---------- */
+function viewHome(doc){
+  var h="";
+  h+=liveBanner();
+
+  var period=doc.meta.filter(function(m){return /커버\s*기간/.test(m);})[0]||"";
+  var note=doc.meta.filter(function(m){return !/커버\s*기간/.test(m);}).join(" ");
+  h+='<div class="hero"><div class="kicker">Daily Briefing</div>'+
+     "<h1>"+esc(doc.title||("On-device AI 동향 브리핑 — "+doc.date))+"</h1>"+
+     '<div class="meta">'+(period?"<span>"+inline(period)+"</span>":"")+"</div>"+
+     (note?'<div class="meta" style="margin-top:.5rem">'+inline(note)+"</div>":"")+
+     "</div>";
+
+  // Executive Summary
+  var ex=doc.sections.filter(function(s){return s.kind==="exec";})[0];
+  if(ex){
+    var items=parseExec(ex.body);
+    h+='<div class="sec-title"><h2>🎯 Executive Summary</h2><span class="count">'+(items.length||"")+(items.length?"건":"")+'</span>'+
+       '<span class="line"></span><a class="all" href="#/'+doc.date+"/"+ex.slug+'">전문 보기 →</a></div>';
+    if(items.length){
+      h+='<div class="cards three">'+items.map(function(it,n){
+        return '<a class="card" href="#/'+doc.date+"/"+ex.slug+"/"+n+'">'+
+          thumb("exec","var(--accent)","🎯","Key Finding",it.n)+
+          '<div class="inner"><h3>'+esc(it.title)+"</h3>"+
+          '<div class="foot"><span class="badge">'+(it.ev.length?"근거 "+it.ev.length+"건":"시사점 포함")+'</span><span class="go">전문 보기 →</span></div>'+
+          "</div></a>";
+      }).join("")+"</div>";
+    } else {
+      h+='<div class="panel"><div class="pbody" style="padding:1.2rem 1.4rem">'+md2html(ex.body)+"</div></div>";
+    }
+  }
+
+  // Action Required
+  var act=doc.sections.filter(function(s){return s.kind==="action";})[0];
+  if(act){
+    h+='<div class="sec-title"><h2>⚡ 즉시 검토 필요</h2><span class="count">'+(act.rowCount||"")+(act.rowCount?"건":"")+'</span><span class="line"></span></div>';
+    h+='<div class="panel"><div class="pbody">'+md2html(act.body)+"</div></div>";
+  }
+
+  // 6 domain cards
+  var doms=doc.sections.filter(function(s){return s.kind==="domain";});
+  if(doms.length){
+    h+='<div class="sec-title"><h2>모니터링 항목</h2><span class="count">'+doms.length+'개 도메인</span><span class="line"></span></div>';
+    h+='<div class="cards">'+doms.map(function(s){
+      var m=s.meta, cnt=s.count||0;
+      return '<a class="card" href="#/'+doc.date+"/"+s.slug+'">'+
+        thumb(m.key,m.color,m.icon,m.cat)+
+        '<div class="inner">'+
+          "<h3>"+esc(cleanTitle(s.plain))+"</h3>"+
+          '<div class="foot"><span class="badge">'+(cnt?cnt+"건":"—")+'</span><span class="go">자세히 보기 →</span></div>'+
+        "</div></a>";
+    }).join("")+"</div>";
+  }
+
+  // tail sections
+  var tails=doc.sections.filter(function(s){return s.kind==="tail"||s.kind==="other";});
+  if(tails.length){
+    h+='<div class="sec-title"><h2>부록</h2><span class="line"></span></div>';
+    h+='<div class="mini">'+tails.map(function(s){
+      var m=s.meta||{icon:"📄",cat:"SECTION"};
+      return '<a class="card" href="#/'+doc.date+"/"+s.slug+'">'+
+        thumb("tail","var(--text-3)",m.icon,m.cat)+
+        '<div class="inner"><h3>'+esc(cleanTitle(s.plain))+"</h3>"+
+        '<div class="foot"><span class="badge">'+(s.count?s.count+"건":"—")+'</span><span class="go">보기 →</span></div></div></a>';
+    }).join("")+"</div>";
+  }
+
+  // archive
+  if(S.reports.length>1){
+    h+='<div class="sec-title"><h2>지난 브리핑</h2><span class="count">'+S.reports.length+'건</span><span class="line"></span></div>';
+    h+='<div class="arch">'+S.reports.map(function(r){
+      return '<a class="'+(r.date===doc.date?"cur":"")+'" href="#/'+r.date+'">'+r.date+"</a>";
+    }).join("")+"</div>";
+  }
+
+  $("app").innerHTML=h;
+  foot(doc);
+  window.scrollTo(0,0);
+}
+
+function viewDetail(doc,slug,itemIdx){
+  var idx=-1;
+  doc.sections.forEach(function(s,n){ if(s.slug===slug) idx=n; });
+  if(idx<0){ location.hash="#/"+doc.date; return; }
+  var s=doc.sections[idx];
+  var isExec=s.kind==="exec";
+  var m=s.meta||(isExec
+    ? {icon:"🎯", cat:"EXECUTIVE SUMMARY", color:"var(--accent)", desc:"이번 기간의 핵심 판단과 근거"}
+    : {icon:"📄", cat:"SECTION", color:"var(--accent)", desc:""});
+  var nav=doc.sections.filter(function(x){return x.kind==="exec"||x.kind==="domain"||x.kind==="tail";});
+  var pos=nav.indexOf(s), prev=pos>0?nav[pos-1]:null, next=pos>=0&&pos<nav.length-1?nav[pos+1]:null;
+
+  var h='<div class="crumb"><a href="#/'+doc.date+'">← '+doc.date+' 브리핑</a><span>/</span><span>'+esc(s.plain)+"</span></div>";
+  var mkey = isExec ? "exec" : (m.key || "tail");
+  h+='<div class="dhead" style="background:linear-gradient(135deg,'+m.color+',color-mix(in srgb,'+m.color+' 48%, #0b0e13))">'+
+     '<svg class="dmotif" viewBox="0 0 200 112" preserveAspectRatio="xMidYMid slice" aria-hidden="true">'+(MOTIF[mkey]||MOTIF.tail)+"</svg>"+
+     '<div class="dinner"><div class="cat">'+m.icon+" "+m.cat+"</div>"+
+     "<h1>"+esc(cleanTitle(s.plain))+"</h1>"+
+     "<p>"+esc(m.desc||"")+"</p></div></div>";
+
+  // Executive Summary는 항목별 블록으로 전문을 펼친다 (잘림 없음)
+  var execItems=null;
+  if(isExec){
+    execItems=parseExec(s.body);
+    if(execItems.length){
+      h+='<div class="dlayout"><div class="execfull" id="art">'+execItems.map(function(it,n){
+        var ev="";
+        if(it.ev.length){
+          ev='<div class="ev"><div class="evlabel">근거 '+it.ev.length+"건</div><ul>"+
+             it.ev.map(function(e){
+               return "<li>"+(e.url
+                 ? '<a href="'+e.url+'" target="_blank" rel="noopener">'+esc(e.label)+'<span class="ext">↗</span></a>'
+                 : '<span class="noref">'+esc(e.label)+"</span>")+"</li>";
+             }).join("")+"</ul></div>";
+        }
+        return '<div class="blk" id="e'+n+'"><div class="n">'+esc(it.n)+"</div>"+
+          "<h3>"+esc(it.title)+"</h3>"+
+          '<div class="desc">'+md2html(it.descRaw)+"</div>"+
+          ev+
+          (it.soRaw?'<div class="so"><b>시사점</b> '+md2html(it.soRaw)+"</div>":"")+
+          "</div>";
+      }).join("")+"</div>"+
+      '<nav class="toc" id="toc"><div class="label">이 페이지</div><div id="tocLinks"></div></nav></div>';
+    } else {
+      h+='<div class="dlayout"><article id="art">'+md2html(s.body)+"</article>"+
+         '<nav class="toc" id="toc"><div class="label">이 페이지</div><div id="tocLinks"></div></nav></div>';
+      execItems=null;
+    }
+  } else {
+    h+='<div class="dlayout"><article id="art">'+md2html(s.body)+"</article>"+
+       '<nav class="toc" id="toc"><div class="label">이 페이지</div><div id="tocLinks"></div></nav></div>';
+  }
+  h+='<div class="pager">'+
+     (prev?'<a href="#/'+doc.date+"/"+prev.slug+'"><div class="dir">← 이전</div><div class="t">'+esc(prev.plain)+"</div></a>":"")+
+     (next?'<a href="#/'+doc.date+"/"+next.slug+'" style="text-align:right"><div class="dir">다음 →</div><div class="t">'+esc(next.plain)+"</div></a>":"")+
+     "</div>";
+
+  $("app").innerHTML=h;
+  foot(doc);
+
+  // TOC — exec는 블록 단위, 그 외는 h3 단위
+  var anchors = execItems
+    ? Array.prototype.slice.call(document.querySelectorAll("#art .blk"))
+    : Array.prototype.slice.call(document.querySelectorAll("#art h3"));
+  var links=$("tocLinks");
+  if(anchors.length){
+    anchors.forEach(function(x,n){
+      if(!x.id) x.id="i"+n;
+      var a=document.createElement("a");
+      a.href="#"+x.id;
+      a.textContent = execItems ? (execItems[n].n+". "+execItems[n].title) : x.textContent.trim();
+      a.onclick=function(e){ e.preventDefault(); x.scrollIntoView({behavior:"smooth",block:"start"}); };
+      links.appendChild(a);
+    });
+    var obs=new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if(!e.isIntersecting) return;
+        Array.prototype.forEach.call(links.querySelectorAll("a"),function(a){
+          a.classList.toggle("active", a.getAttribute("href")==="#"+e.target.id);
+        });
+      });
+    },{rootMargin:"-12% 0px -78% 0px"});
+    anchors.forEach(function(x){obs.observe(x);});
+  } else { $("toc").style.display="none"; }
+
+  // 카드에서 특정 항목을 눌러 들어온 경우 해당 블록으로 이동
+  var target = (itemIdx!=null && anchors[itemIdx]) ? anchors[itemIdx] : null;
+  if(target){
+    target.scrollIntoView({block:"start"});
+    target.style.transition="box-shadow .5s ease";
+    target.style.boxShadow="0 0 0 2px var(--accent)";
+    setTimeout(function(){ target.style.boxShadow=""; }, 1400);
+  } else {
+    window.scrollTo(0,0);
+  }
+}
+
+/* ---------- router ---------- */
+function busy(msg){ $("app").innerHTML='<div class="state"><div class="spinner"></div>'+msg+"</div>"; }
+function fail(msg){ $("app").innerHTML='<div class="state">'+msg+"</div>"; foot(null); }
+
+function route(){
+  if(!S.reports.length){
+    fail(liveBanner()
+      ? '<div style="max-width:520px;margin:0 auto">'+liveBanner()+"</div>"
+      : "표시할 리포트가 없습니다. 매일 08:00에 자동 생성됩니다.");
+    return;
+  }
+  var parts=location.hash.replace(/^#\/?/,"").split("/").filter(Boolean);
+  var date=parts[0], slug=parts[1], item=parts[2];
+  var itemIdx = (item!=null && /^\d+$/.test(item)) ? parseInt(item,10) : null;
+  if(!date || !S.reports.filter(function(r){return r.date===date;}).length) date=S.reports[0].date;
+  $("picker").value=date;
+  S.date=date;
+  busy(date+" 브리핑 불러오는 중…");
+  loadReport(date).then(function(doc){
+    if(slug) viewDetail(doc,slug,itemIdx); else viewHome(doc);
+  }).catch(function(e){ fail("리포트를 불러오지 못했습니다. <code>"+esc(e.message)+"</code>"); });
+}
+
+function boot(){
+  busy("리포트를 불러오는 중…");
+  loadIndex().then(function(){ chrome(); route(); }).catch(function(e){
+    var m=e.message==="RATE_LIMIT" ? "GitHub API 요청 한도(시간당 60회)를 초과했습니다. 잠시 후 새로고침해 주세요."
+      : e.message==="NOT_FOUND" ? "리포지토리에서 <code>reports/</code> 폴더를 찾지 못했습니다."
+      : "목록을 불러오지 못했습니다. <code>"+esc(e.message)+"</code>";
+    fail(m);
+  });
+}
+window.addEventListener("hashchange",route);
+$("reloadBtn").onclick=function(){ S.cache={}; boot(); };
+boot();
+setInterval(function(){ if(S.wipDate && S.wipDate!==(S.reports[0]||{}).date){ S.cache={}; boot(); } },180000);
+})();
+</script>
+</body>
+</html>

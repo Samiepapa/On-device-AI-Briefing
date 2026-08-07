@@ -1,0 +1,14 @@
+# 실행 로그
+logs/
+
+# 에이전트 정의 — 역할 프롬프트에 조직 맥락이 들어가므로 공개하지 않는다
+.claude/
+
+# 내부 전용 산출물 — 원본(비편집) 리포트와 도메인별 근거 파일
+reports/_internal/
+
+# 중간 산출물은 진행표(STATUS.md)만 공개한다
+reports/_wip/**
+!reports/_wip/
+!reports/_wip/*/
+!reports/_wip/*/STATUS.md

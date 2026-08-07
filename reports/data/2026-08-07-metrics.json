@@ -1,0 +1,55 @@
+{
+  "date": "2026-08-07",
+  "_meta": {
+    "coverage": "2026-07-08 ~ 2026-08-07",
+    "baseline": true,
+    "note": "초회 baseline. 이전 리포트 없어 Δ 산출 불가. 다음 회차는 이 파일을 기준선으로 Δ를 계산한다.",
+    "hf_downloads_field_note": "HF API 'downloads' = 최근 30일 누적 다운로드(전체 누적 아님). Δ는 반드시 동일 필드끼리 비교할 것.",
+    "github_note": "GitHub API는 '최근 N일 star 증가분'을 제공하지 않음. 급증 판정은 2회차부터 가능."
+  },
+  "huggingface": [
+    {"id": "LiquidAI/LFM2.5-2.6B", "downloads": 73573, "likes": 341, "params": 2697198592},
+    {"id": "LiquidAI/LFM2.5-2.6B-GGUF", "downloads": 12790, "likes": 130, "params": null},
+    {"id": "LiquidAI/LFM2.5-2.6B-ONNX", "downloads": 811, "likes": 17, "params": null},
+    {"id": "LiquidAI/LFM2.5-8B-A1B-MLX-8bit", "downloads": 1553, "likes": 29, "params": 8467856128},
+    {"id": "LiquidAI/LFM2.5-1.2B-Instruct-ONNX", "downloads": 1310, "likes": 35, "params": null},
+    {"id": "LiquidAI/LFM2.5-VL-1.6B-ONNX", "downloads": 473, "likes": 33, "params": null},
+    {"id": "LiquidAI/LFM2.5-230M-ONNX", "downloads": 511, "likes": 16, "params": null},
+    {"id": "LiquidAI/LFM2.5-350M-ONNX", "downloads": 446, "likes": 18, "params": null},
+    {"id": "Audio8/Audio8-TTS-Preview-0.6b", "downloads": 12211, "likes": 298, "params": 601159424},
+    {"id": "Audio8/Audio8-TTS-Preview-0.6B-ONNX-INT4", "downloads": 179, "likes": 36, "params": null},
+    {"id": "ornith-ai/Ornith-1.0-9B-GGUF", "downloads": 4632751, "likes": 613, "params": null},
+    {"id": "cyankiwi/Qwen3.5-9B-AWQ-4bit", "downloads": 320768, "likes": 35, "params": 9875665038},
+    {"id": "onnx-community/embeddinggemma-300m-ONNX", "downloads": 150895, "likes": 73, "params": null},
+    {"id": "mistralai/Shieldstral-1.0-3B", "downloads": 1511, "likes": 165, "params": 3849090048},
+    {"id": "Jackrong/DeepSeek-V4-Pro-Qwen3.5-9B-MTP-GGUF", "downloads": 42552, "likes": 33, "params": null},
+    {"id": "Jackrong/DeepSeek-V4-Pro-Qwen3.5-4B-MTP-GGUF", "downloads": 4800, "likes": 13, "params": null}
+  ],
+  "huggingface_watchlist_over_10b": [
+    {"id": "prism-ml/Bonsai-27B-mlx-1bit", "downloads": 593916, "likes": 204, "note": "1bit MLX, 실효 풋프린트 기준 추적"},
+    {"id": "prism-ml/Ternary-Bonsai-27B-mlx-2bit", "downloads": 591608, "likes": 168, "note": "2bit ternary MLX"},
+    {"id": "deepgrove/maple-preview", "downloads": 419, "likes": 213, "params": 20214030336, "note": "ternary MoE, 20.2B"},
+    {"id": "deepgrove/maple-preview-2bit-mlx", "downloads": 176, "likes": 24, "note": "maple 2bit MLX"}
+  ],
+  "github": [
+    {"repo": "ollama/ollama", "stars": 177962},
+    {"repo": "ggml-org/llama.cpp", "stars": 122941},
+    {"repo": "ml-explore/mlx", "stars": 27857},
+    {"repo": "google-ai-edge/gallery", "stars": 24374},
+    {"repo": "Tencent/ncnn", "stars": 23652},
+    {"repo": "mlc-ai/mlc-llm", "stars": 23038},
+    {"repo": "microsoft/onnxruntime", "stars": 21293},
+    {"repo": "alibaba/MNN", "stars": 15825},
+    {"repo": "google-ai-edge/LiteRT-LM", "stars": 6115},
+    {"repo": "cactus-compute/cactus", "stars": 5563},
+    {"repo": "pytorch/executorch", "stars": 4869},
+    {"repo": "qualcomm/aimet", "stars": 2674}
+  ],
+  "github_reference_excluded": [
+    {"repo": "vllm-project/vllm", "stars": 88393, "note": "데이터센터 serving 전용. 서버측 기준선으로만 기록"},
+    {"repo": "omnimind-ai/OmniBot", "stars": 1984, "note": "온디바이스 폰 제어 에이전트, 신규 카테고리 추적"},
+    {"repo": "apple/coreai-models", "stars": 1468, "note": "2026-06 신규"},
+    {"repo": "kellyvv/PhoneClaw", "stars": 1201, "note": "온디바이스 폰 제어 에이전트(Swift)"},
+    {"repo": "agents-io/PokeClaw", "stars": 999, "note": "Gemma 4 기반 Android 제어(Kotlin)"}
+  ]
+}
