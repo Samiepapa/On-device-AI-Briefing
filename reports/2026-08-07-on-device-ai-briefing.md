@@ -44,6 +44,14 @@ OPPO가 7/27 **업계 최초로 에이전트 오케스트레이션 계층 자체
 - **성숙도**: 논문 + 실리콘 프로토타입 단계. 상용 IP 아님.
 - 출처: https://arxiv.org/abs/2608.03867
 
+### ▪ AdaMX — MXFP4 정확도 손실의 83%를 회복하는 heterogeneity-aware microscaling
+- **무엇**: MXFP4가 블록마다 특성이 다른데 단일 스케일링 방식을 강제한다는 점을 지적하고, 블록별로 precision-recovery 기법과 operand별 표현을 적응적으로 선택하는 포맷/하드웨어 co-design.
+- **수치**: commonsense reasoning에서 MXFP4 정확도 손실의 **83%** 제거, MMLU에서 **82%** 제거 / NVFP4 대비로는 손실의 43%·27% 회복 / 멀티모달(Gemma-4 12B)에서 **FP16 정확도의 96%** 유지 / 3B~70B 검증 / **22nm FD-SOI 가속기 프로토타입**에서 baseline MXFP4 대비 시스템 에너지 오버헤드 **약 1%**.
+- **성숙도**: 논문 + 실리콘 프로토타입 단계. 상용 IP 아님.
+- 출처: https://arxiv.org/abs/2608.03867
+
+---
+
 ---
 
 ### ▪ Prox — 학습 없이 FFN activation sparsity로 decode 2배

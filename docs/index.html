@@ -240,6 +240,17 @@ tr:last-child td{border-bottom:0}
   margin:0; font-size:1.05rem; letter-spacing:-.02em; line-height:1.42; font-weight:650;
   display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
 }
+/* 대표 항목 미리보기 — 한 줄씩, 넘치면 말줄임 */
+.card ul.items{margin:.15rem 0 0; padding:0; list-style:none; display:flex; flex-direction:column; gap:.34rem}
+.card ul.items li{
+  font-size:.8rem; line-height:1.45; color:var(--text-2);
+  padding-left:.82rem; position:relative;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.card ul.items li::before{content:"▪"; position:absolute; left:0; top:0; color:var(--text-3); font-size:.68rem}
+.card ul.items li.more{color:var(--text-3); font-size:.75rem; padding-left:.82rem}
+.card ul.items li.more::before{content:"+"}
+.card .lede{margin:.15rem 0 0; font-size:.82rem; color:var(--text-2); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}
 .card .foot{
   margin-top:auto; padding-top:.8rem; display:flex; align-items:center; justify-content:space-between;
   font-size:.79rem; color:var(--text-3); border-top:1px solid var(--border);
@@ -696,10 +707,16 @@ function viewHome(doc){
     h+='<div class="sec-title"><h2>모니터링 항목</h2><span class="count">'+doms.length+'개 도메인</span><span class="line"></span></div>';
     h+='<div class="cards">'+doms.map(function(s){
       var m=s.meta, cnt=s.count||0;
+      // 대표 항목 3건을 카드에 노출한다 — 제목만으로는 그 도메인에 뭐가 잡혔는지 알 수 없다
+      var prev=s.items.slice(0,3).map(function(t){
+        return '<li title="'+esc(t)+'">'+esc(t)+"</li>";
+      }).join("");
+      var more=cnt>3 ? '<li class="more">외 '+(cnt-3)+"건</li>" : "";
       return '<a class="card" href="#/'+doc.date+"/"+s.slug+'">'+
         thumb(m.key,m.color,m.icon,m.cat)+
         '<div class="inner">'+
           "<h3>"+esc(cleanTitle(s.plain))+"</h3>"+
+          (prev?'<ul class="items">'+prev+more+"</ul>":'<p class="lede">'+esc(m.desc)+"</p>")+
           '<div class="foot"><span class="badge">'+(cnt?cnt+"건":"—")+'</span><span class="go">자세히 보기 →</span></div>'+
         "</div></a>";
     }).join("")+"</div>";
