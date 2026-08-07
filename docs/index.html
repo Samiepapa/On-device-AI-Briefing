@@ -617,7 +617,7 @@ var S={reports:[], wipDate:null, cache:{}, date:null, doc:null, viaApi:false};
 
 /* 목록·본문은 Pages와 같은 출처에서 읽는다.
    api.github.com 은 미인증 시 IP당 시간당 60회 제한이라, 통신사 NAT로 IP를 공유하는
-   모바일에서 쉽게 막히고 일부 사내망은 호스트 자체를 차단한다.
+   모바일에서 쉽게 막히고 일부 네트워크는 호스트 자체를 차단한다.
    scripts/build-index.ps1 이 만들어 두는 docs/index.json 을 1순위로 쓰고,
    그 파일이 없을 때만 GitHub API로 폴백한다. */
 function loadIndexLocal(){
