@@ -1,4 +1,5 @@
 # On-device AI 동향 브리핑 — 2026-08-07
+> 커버 기간: 2026-07-08 ~ 2026-08-07
 > **초회 baseline 리포트** — 이전 리포트가 없어 Δ(증감) 수치는 다음 회차부터 표기됩니다. 이번 회차의 HF 다운로드·GitHub star는 `reports/data/2026-08-07-metrics.json`에 기준선으로 기록했습니다.
 
 ## 🎯 Executive Summary

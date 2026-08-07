@@ -80,8 +80,38 @@ button.ghost{min-width:2.3rem}
 .hero .kicker{font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); font-weight:700}
 .hero h1{margin:.5rem 0 .5rem; font-size:1.85rem; line-height:1.25; letter-spacing:-.03em}
 @media(max-width:640px){ .hero h1{font-size:1.4rem} }
-.hero .meta{color:var(--text-2); font-size:.86rem; display:flex; flex-wrap:wrap; gap:.4rem 1rem}
-.hero .meta b{color:var(--text); font-weight:600}
+.hero .chips{display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.9rem}
+.chip{
+  font-size:.76rem; font-weight:600; color:var(--text-2);
+  background:var(--surface-2); border:1px solid var(--border);
+  padding:.22rem .6rem; border-radius:20px;
+}
+.chip.strong{background:var(--accent-soft); border-color:transparent; color:var(--accent)}
+
+/* 리포트 정보 (페이지 하단) */
+.info{
+  background:var(--surface); border:1px solid var(--border); border-radius:14px;
+  padding:1.2rem 1.4rem; box-shadow:var(--shadow);
+}
+@media(max-width:640px){ .info{padding:1rem 1.1rem} }
+.info dl{
+  margin:0; display:grid; grid-template-columns:max-content 1fr;
+  gap:.5rem 1.4rem; font-size:.87rem; align-items:baseline;
+}
+.info dt{color:var(--text-3); font-weight:600; white-space:nowrap}
+.info dd{margin:0; color:var(--text-2); overflow-wrap:anywhere}
+.info dd a{color:var(--accent); text-decoration:none; border-bottom:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
+.info .notes{
+  margin-top:1.1rem; padding-top:1rem; border-top:1px solid var(--border);
+  font-size:.86rem; color:var(--text-2);
+}
+.info .notes p{margin:.4rem 0}
+.info .notes p:first-child{margin-top:0}
+.info .notes strong{color:var(--text)}
+.info .notes code{
+  font-family:var(--mono); font-size:.86em; background:var(--surface-2);
+  border:1px solid var(--border); border-radius:5px; padding:.1em .38em;
+}
 
 /* ================= banners ================= */
 .banner{
@@ -565,12 +595,17 @@ function viewHome(doc){
   var h="";
   h+=liveBanner();
 
-  var period=doc.meta.filter(function(m){return /커버\s*기간/.test(m);})[0]||"";
-  var note=doc.meta.filter(function(m){return !/커버\s*기간/.test(m);}).join(" ");
+  // 히어로는 제목과 날짜만. 부연 설명은 페이지 하단 "리포트 정보"로 내린다.
+  var period=(doc.meta.filter(function(m){return /커버\s*기간/.test(m);})[0]||"")
+               .replace(/^커버\s*기간:?\s*/,"").split("|")[0].trim();
+  var notes=doc.meta.filter(function(m){return !/커버\s*기간/.test(m);});
+  var title=(doc.title||"On-device AI 동향 브리핑").replace(/\s*[—–-]\s*\d{4}-\d{2}-\d{2}\s*$/,"");
+
   h+='<div class="hero"><div class="kicker">Daily Briefing</div>'+
-     "<h1>"+esc(doc.title||("On-device AI 동향 브리핑 — "+doc.date))+"</h1>"+
-     '<div class="meta">'+(period?"<span>"+inline(period)+"</span>":"")+"</div>"+
-     (note?'<div class="meta" style="margin-top:.5rem">'+inline(note)+"</div>":"")+
+     "<h1>"+esc(title)+"</h1>"+
+     '<div class="chips"><span class="chip strong">'+esc(doc.date)+"</span>"+
+     (period?'<span class="chip">커버 '+esc(period)+"</span>":"")+
+     '<span class="chip">6개 도메인</span></div>'+
      "</div>";
 
   // Executive Summary
@@ -634,6 +669,18 @@ function viewHome(doc){
       return '<a class="'+(r.date===doc.date?"cur":"")+'" href="#/'+r.date+'">'+r.date+"</a>";
     }).join("")+"</div>";
   }
+
+  // 리포트 정보 — 히어로에서 내린 부연 설명
+  h+='<div class="sec-title"><h2>리포트 정보</h2><span class="line"></span></div>';
+  h+='<div class="info">'+
+     '<dl>'+
+       "<dt>작성일</dt><dd>"+esc(doc.date)+"</dd>"+
+       (period?"<dt>커버 기간</dt><dd>"+esc(period)+"</dd>":"")+
+       "<dt>생성 주기</dt><dd>매일 08:00 KST 자동 생성</dd>"+
+       "<dt>원본</dt><dd><a href=\"https://github.com/"+OWNER+"/"+REPO+"/blob/"+BRANCH+"/reports/"+doc.file+"\" target=\"_blank\" rel=\"noopener\">"+esc(doc.file)+"</a></dd>"+
+     "</dl>"+
+     (notes.length?'<div class="notes">'+notes.map(function(t){return "<p>"+inline(t)+"</p>";}).join("")+"</div>":"")+
+     "</div>";
 
   $("app").innerHTML=h;
   foot(doc);
