@@ -392,7 +392,7 @@ footer .fwrap span{overflow-wrap:anywhere}
    같은 블록에 두면 본 스크립트가 문법 오류로 죽을 때 이 코드도 등록되지 않아
    화면에 아무것도 남지 않는다(구형 모바일 브라우저에서 실제로 겪은 증상). */
 (function(){
-  var BUILD = "2026-08-07.3";
+  var BUILD = "2026-08-07.4";
   window.__BUILD__ = BUILD;
   var shown = false;
   function report(kind, msg, extra){
@@ -422,13 +422,14 @@ footer .fwrap span{overflow-wrap:anywhere}
     var r = e.reason;
     report("네트워크/비동기 오류", (r && r.message) || r || "unknown", "");
   });
-  // 8초 안에 본문이 그려지지 않으면 멈춘 지점을 알려준다
+  // 느린 모바일 회선을 감안해 넉넉히 기다린다. 그 뒤에도 스피너면 멈춘 것으로 본다.
+  // (그 사이 데이터가 도착하면 본 스크립트가 화면을 덮어쓰므로 잘못 떠도 자동 복구된다)
   setTimeout(function(){
     var el = document.getElementById("app");
     if (el && el.innerHTML.indexOf("spinner") >= 0) {
-      report("응답 없음", "8초 안에 목록을 받지 못했습니다. 네트워크 차단 또는 캐시 문제일 수 있습니다.", "");
+      report("응답 없음", "목록을 받지 못했습니다. 네트워크 차단이거나, 브라우저가 예전 파일을 캐시하고 있을 수 있습니다. 시크릿 탭에서 열어보세요.", "");
     }
-  }, 8000);
+  }, 15000);
 })();
 </script>
 
