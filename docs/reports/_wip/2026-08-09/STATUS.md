@@ -9,7 +9,7 @@
 | 3 | 업계 동향 | ⏳ 진행 중 | 03-industry.md |
 | 4 | 학계 동향 | ⏳ 진행 중 | 04-academia.md |
 | 5 | HuggingFace | ✅ 완료 (21:13) | 05-huggingface.md |
-| 6 | GitHub | ⏳ 진행 중 | 06-github.md |
+| 6 | GitHub | ✅ 완료 (21:14) | 06-github.md |
 | — | Executive Summary | ⬜ 대기 | (전 도메인 완료 후) |
 
 > 완료된 섹션은 위 파일명으로 이 폴더에 바로 저장됩니다. 지금 열어보셔도 됩니다.
