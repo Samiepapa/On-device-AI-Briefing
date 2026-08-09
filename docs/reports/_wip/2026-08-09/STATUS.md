@@ -8,7 +8,7 @@
 | 2 | Inference 최적화 | ✅ 완료 (21:12) | 02-inference.md |
 | 3 | 업계 동향 | ⏳ 진행 중 | 03-industry.md |
 | 4 | 학계 동향 | ⏳ 진행 중 | 04-academia.md |
-| 5 | HuggingFace | ⏳ 진행 중 | 05-huggingface.md |
+| 5 | HuggingFace | ✅ 완료 (21:13) | 05-huggingface.md |
 | 6 | GitHub | ⏳ 진행 중 | 06-github.md |
 | — | Executive Summary | ⬜ 대기 | (전 도메인 완료 후) |
 
