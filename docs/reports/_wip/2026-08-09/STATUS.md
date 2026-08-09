@@ -4,8 +4,8 @@
 
 | # | 도메인 | 상태 | 산출물 |
 |---|---|---|---|
-| 1 | 모델 최적화 | ⏳ 진행 중 | 01-model-optimization.md |
-| 2 | Inference 최적화 | ⏳ 진행 중 | 02-inference.md |
+| 1 | 모델 최적화 | ✅ 완료 (21:12) | 01-model-optimization.md |
+| 2 | Inference 최적화 | ✅ 완료 (21:12) | 02-inference.md |
 | 3 | 업계 동향 | ⏳ 진행 중 | 03-industry.md |
 | 4 | 학계 동향 | ⏳ 진행 중 | 04-academia.md |
 | 5 | HuggingFace | ⏳ 진행 중 | 05-huggingface.md |
