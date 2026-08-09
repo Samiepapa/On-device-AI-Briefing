@@ -6,11 +6,11 @@
 |---|---|---|---|
 | 1 | 모델 최적화 | ✅ 완료 (21:12) | 01-model-optimization.md |
 | 2 | Inference 최적화 | ✅ 완료 (21:12) | 02-inference.md |
-| 3 | 업계 동향 | ⏳ 진행 중 | 03-industry.md |
-| 4 | 학계 동향 | ⏳ 진행 중 | 04-academia.md |
+| 3 | 업계 동향 | ✅ 완료 (21:14) | 03-industry.md |
+| 4 | 학계 동향 | ✅ 완료 (21:14) | 04-academia.md |
 | 5 | HuggingFace | ✅ 완료 (21:13) | 05-huggingface.md |
 | 6 | GitHub | ✅ 완료 (21:14) | 06-github.md |
-| — | Executive Summary | ⬜ 대기 | (전 도메인 완료 후) |
+| — | Executive Summary | ⏳ 조립 중 | (전 도메인 완료 후) |
 
 > 완료된 섹션은 위 파일명으로 이 폴더에 바로 저장됩니다. 지금 열어보셔도 됩니다.
 > 직전 리포트가 2일 전(2026-08-07)이라 커버 기간이 짧습니다. 신규 항목이 적은 도메인은 "특이사항 없음"으로 명시됩니다.
